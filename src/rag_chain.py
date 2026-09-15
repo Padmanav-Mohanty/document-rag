@@ -23,12 +23,12 @@ Answer:"""
         docs = retriever.invoke(question)
         context = format_docs(docs)
 
-        response = llm.invoke(
-            prompt.format(
-                context=context,
-                question=question,
-            )
+        messages = prompt.format_messages(
+            context=context,
+            question=question,
         )
+
+        response = llm.invoke(messages)
 
         return {
             "answer": response.content,
