@@ -1,5 +1,3 @@
-from langchain_openrouter import ChatOpenRouter
-
 def create_retriever(vector_store):
     """Create a retriever from the Chroma vector store."""
 
