@@ -6,6 +6,10 @@ A Retrieval-Augmented Generation (RAG) pipeline that answers questions over a co
 
 This project ingests PDF files, splits them into searchable chunks, stores embeddings in a vector database, and uses an LLM to generate grounded answers from the retrieved context.
 
+## Demo
+
+![RAG Demo](assets/rag-demo.png)
+
 **Pipeline:**
 
 ```
