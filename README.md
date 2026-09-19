@@ -16,6 +16,64 @@ This project ingests PDF files, splits them into searchable chunks, stores embed
 PDFs → Load → Chunk → Embed → ChromaDB → Retrieve → LLM → Answer
 ```
 
+## Architecture
+
+The application follows an end-to-end Retrieval-Augmented Generation (RAG) pipeline:
+
+```mermaid
+flowchart TD
+    A[PDF Documents] --> B[Document Ingestion<br/>LangChain]
+    B --> C[Text Chunking<br/>Recursive Text Splitter]
+    C --> D[Embedding Generation<br/>HuggingFace Model]
+    D --> E[(ChromaDB<br/>Vector Store)]
+
+    subgraph Query Time
+        Q[User Question] --> QE[Question Embedding]
+        QE --> R[Similarity Search]
+        E --> R
+        R --> CH[Relevant Chunks]
+        CH --> CTX[Context + Question]
+        CTX --> LLM[LLM Generation<br/>OpenRouter]
+        LLM --> OUT[Answer + Sources]
+    end
+```
+
+### Pipeline Flow
+
+1. **Document Ingestion**
+   PDF documents are loaded and converted into text using LangChain document loaders.
+
+2. **Text Chunking**
+   The extracted text is divided into smaller, overlapping chunks using a recursive text splitter. This makes the documents suitable for embedding and retrieval.
+
+3. **Embedding Generation**
+   Each text chunk is converted into a numerical vector representation using a Hugging Face embedding model.
+
+4. **Vector Storage**
+   The generated embeddings and their corresponding text chunks are stored in ChromaDB.
+
+5. **Retrieval**
+   When a user submits a question, the question is embedded and used to retrieve the most semantically relevant document chunks.
+
+6. **LLM Generation**
+   The retrieved context is provided to an LLM through OpenRouter, which generates an answer grounded in the retrieved documents.
+
+7. **Source Tracking**
+   The application returns the generated answer together with the relevant source documents, allowing the user to trace the information back to the original material.
+
+### End-to-End Flow
+
+```mermaid
+flowchart TD
+    A[User Question] --> B[Question Embedding]
+    B --> C[ChromaDB Similarity Search]
+    C --> D[Relevant Document Chunks]
+    D --> E[Context + Question]
+    E --> F[LLM]
+    F --> G[Grounded Answer]
+    G --> H[Answer + Sources]
+```    
+
 ## Features
 
 - **PDF ingestion** — loads and parses PDFs page-by-page with metadata tracking
@@ -132,3 +190,22 @@ Key parameters you can adjust:
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## References
+
+The following research papers were used as data sources for this project:
+
+1. He, K., Zhang, X., Ren, S., & Sun, J. (2015). **Deep Residual Learning for Image Recognition.**
+   [arXiv:1512.03385](https://arxiv.org/abs/1512.03385)
+
+2. Brown, T. B., et al. (2020). **Language Models are Few-Shot Learners.**
+   [arXiv:2005.14165](https://arxiv.org/abs/2005.14165)
+
+3. Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2018). **BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding.**
+   [arXiv:1810.04805](https://arxiv.org/abs/1810.04805)
+
+4. Vaswani, A., et al. (2017). **Attention Is All You Need.**
+   [arXiv:1706.03762](https://arxiv.org/abs/1706.03762)
+
+5. Kingma, D. P., & Ba, J. (2014). **Adam: A Method for Stochastic Optimization.**
+   [arXiv:1412.6980](https://arxiv.org/abs/1412.6980)
